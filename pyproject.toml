@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "dbt-impact"
-version = "0.1.0"
+version = "0.2.0"
 description = "Column-level impact analysis for dbt pull requests: find the downstream models and exposures a change breaks."
 readme = "README.md"
 license = { text = "MIT" }
