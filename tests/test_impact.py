@@ -95,3 +95,10 @@ def test_cli_exit_codes(tmp_path):
     assert out.read_text().startswith(MARKER)
     assert main(["--base", str(BASE), "--current", str(PR), "--fail-on-breaking", "-o", str(out)]) == 1
     assert main(["--base", str(BASE), "--current", str(BASE), "--fail-on-breaking", "--format", "json", "-o", str(out)]) == 0
+
+
+def test_rename_suggestions(report):
+    sugg = {(i.node, i.column): i.suggestion for i in report.breaking}
+    assert sugg[("customers", "first_name")] == "replace `first_name` with `given_name`"
+    assert sugg[("customer_contacts", "email")] is None  # a plain removal has no automatic fix
+    assert "replace `first_name` with `given_name`" in to_markdown(report)

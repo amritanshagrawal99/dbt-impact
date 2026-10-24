@@ -33,8 +33,8 @@ def to_markdown(rep: Report) -> str:
         lines.append("")
 
     if breaking:
-        lines += ["### Breaking", "", "| Downstream model | Reads removed column | Caused by |", "|---|---|---|"]
-        lines += [f"| `{i.node}` | `{i.upstream}.{i.column}` | `{i.via}` |" for i in breaking]
+        lines += ["### Breaking", "", "| Downstream model | Reads removed column | Caused by | Fix |", "|---|---|---|---|"]
+        lines += [f"| `{i.node}` | `{i.upstream}.{i.column}` | `{i.via}` | {i.suggestion or '-'} |" for i in breaking]
         lines.append("")
     if rep.exposures:
         lines += ["### Exposures at risk", "", "| Exposure | Type | Owner | Depends on | Why | Columns |", "|---|---|---|---|---|---|"]

@@ -23,6 +23,7 @@ class Impact:
     column: str
     kind: str  # breaks | propagates
     via: str   # node whose change caused it (the original changed model)
+    suggestion: str | None = None  # concrete edit, when the removal was a detected rename
 
 
 @dataclass
@@ -112,6 +113,11 @@ def compare(base: Manifest, current: Manifest) -> Report:
     order = {n.unique_id: i for i, n in enumerate(base.topo_order())}
     removed_cols.sort(key=lambda nc: order.get(nc[0].unique_id, len(order)))
     _trace(removed_cols, current, cur_facts, rep)
+    renamed = {(node, old): new for node, old, new in rep.rename_hints}
+    for i in rep.breaking:
+        new = renamed.get((i.via, i.column))
+        if new:
+            i.suggestion = f"replace `{i.column}` with `{new}`"
     broken = {i.node for i in rep.breaking}
     rep.unanalysed = {k: v for k, v in rep.unanalysed.items() if k not in broken}
     return rep
