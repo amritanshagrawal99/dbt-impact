@@ -9,11 +9,11 @@
 
 ### Breaking
 
-| Downstream model | Reads removed column | Caused by |
-|---|---|---|
-| `customers` | `stg_customers.first_name` | `stg_customers` |
-| `customer_contacts` | `stg_customers.email` | `stg_customers` |
-| `customers` | `orders.status` | `stg_orders` |
+| Downstream model | Reads removed column | Caused by | Fix |
+|---|---|---|---|
+| `customers` | `stg_customers.first_name` | `stg_customers` | replace `first_name` with `given_name` |
+| `customer_contacts` | `stg_customers.email` | `stg_customers` | - |
+| `customers` | `orders.status` | `stg_orders` | - |
 
 ### Exposures at risk
 
