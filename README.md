@@ -96,6 +96,17 @@ flowchart LR
 - **Breaking SQL still gets analysed.** A model that reads a column which no longer exists can't be qualified against the new
   schema. dbt-impact then re-qualifies it without a schema, so the broken reference is still found.
 
+### Model contracts
+
+For models with `contract: {enforced: true}`, the declared columns are a public API, so changes to them are reported in their
+own **Contract violations** section and count as breaking:
+
+| Problem | Example |
+|---|---|
+| Column removed from the contract | `email` was declared on the base branch and isn't any more |
+| Declared type changed | `customer_id: integer -> bigint` |
+| Contract out of sync with the SQL | a column is declared but not produced (or produced but not declared), which `dbt build` will reject |
+
 ## Limitations
 
 - Jinja-heavy models are analysed through their compiled SQL, so behaviour that depends on `target` / `var()` values reflects the
