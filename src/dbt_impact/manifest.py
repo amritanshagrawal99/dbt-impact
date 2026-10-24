@@ -28,6 +28,7 @@ class Node:
     declared_columns: dict[str, str | None]  # documented in YAML (name -> data_type)
     catalog_columns: dict[str, str] | None = None  # from catalog.json, if provided
     contract_enforced: bool = False  # config.contract.enforced: the declared columns are a public API
+    semantics: dict = field(default_factory=dict)  # snapshot strategy keys, source freshness: behaviour without columns
     children: list[str] = field(default_factory=list)
 
     @property
@@ -98,6 +99,7 @@ def load_manifest(path: str | Path, catalog: str | Path | None = None, dialect: 
                 depends_on=[d for d in (raw.get("depends_on") or {}).get("nodes", [])],
                 declared_columns={c.lower(): (v or {}).get("data_type") for c, v in (raw.get("columns") or {}).items()},
                 contract_enforced=bool(((raw.get("config") or {}).get("contract") or {}).get("enforced")),
+                semantics=_semantics(raw),
             )
     for uid, raw in (data.get("nodes") or {}).items():
         if raw.get("resource_type") == "seed" and uid in nodes and not nodes[uid].declared_columns:
@@ -116,6 +118,28 @@ def load_manifest(path: str | Path, catalog: str | Path | None = None, dialect: 
     if catalog:
         _apply_catalog(nodes, json.loads(Path(catalog).read_text(encoding="utf-8")))
     return Manifest(nodes, exposures, dialect)
+
+
+SNAPSHOT_KEYS = ("strategy", "unique_key", "updated_at", "check_cols", "invalidate_hard_deletes", "hard_deletes")
+
+
+def _semantics(raw: dict) -> dict:
+    cfg = raw.get("config") or {}
+    out = {}
+    if raw.get("resource_type") == "snapshot":
+        for k in SNAPSHOT_KEYS:
+            v = cfg.get(k)
+            if v is not None:
+                out[f"snapshot.{k}"] = ", ".join(map(str, v)) if isinstance(v, (list, tuple)) else v
+    if raw.get("resource_type") == "source":
+        fresh = raw.get("freshness") or {}
+        for level in ("warn_after", "error_after"):
+            rule = fresh.get(level) or {}
+            if rule.get("count") is not None:
+                out[f"freshness.{level}"] = f"{rule['count']} {rule.get('period', '')}".strip()
+        if raw.get("loaded_at_field"):
+            out["freshness.loaded_at_field"] = raw["loaded_at_field"]
+    return out
 
 
 def _seed_header(raw: dict) -> dict[str, str | None]:

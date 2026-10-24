@@ -107,6 +107,16 @@ own **Contract violations** section and count as breaking:
 | Declared type changed | `customer_id: integer -> bigint` |
 | Contract out of sync with the SQL | a column is declared but not produced (or produced but not declared), which `dbt build` will reject |
 
+### Behaviour changes without column changes
+
+Some settings change what the data means while every column stays the same. These are listed in their own section. They
+don't fail the check, but a reviewer should see them:
+
+| Node | Settings |
+|---|---|
+| Snapshots | `strategy`, `unique_key`, `updated_at`, `check_cols`, hard-delete handling |
+| Sources | freshness `warn_after` / `error_after`, `loaded_at_field` |
+
 ## Limitations
 
 - Jinja-heavy models are analysed through their compiled SQL, so behaviour that depends on `target` / `var()` values reflects the
