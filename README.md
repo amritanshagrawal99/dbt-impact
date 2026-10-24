@@ -100,8 +100,8 @@ flowchart LR
 
 - Jinja-heavy models are analysed through their compiled SQL, so behaviour that depends on `target` / `var()` values reflects the
   compile you ran.
-- `UNION` branches with `*`, `PIVOT`, and dialect features that sqlglot can't parse are reported under "could not be
-  analysed" rather than guessed.
+- `PIVOT` and dialect features that sqlglot can't parse are reported under "could not be analysed" rather than guessed.
+  Stars are traced through CTEs, derived tables and every branch of `UNION` / `INTERSECT` / `EXCEPT`.
 - Type changes require a `catalog.json` (from `dbt docs generate`) or documented `data_type`s.
 
 ## Development

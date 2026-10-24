@@ -59,3 +59,22 @@ def test_plain_renames_recorded():
 def test_unparseable_sql_is_opaque_not_fatal():
     f = facts("select from where ((")
     assert f.outputs is None and f.error
+
+
+UNION_UP = {"db.s.a": ["id", "x"], "db.s.b": ["id", "x"]}
+
+
+def test_star_in_every_union_branch():
+    f = analyse_model("select * from db.s.a union all select * from db.s.b", UNION_UP, "duckdb")
+    assert f.star_from == {"db.s.a", "db.s.b"}
+
+
+def test_star_in_one_union_branch_inside_cte():
+    f = analyse_model("with u as (select * from db.s.a union all select id, x from db.s.b) select * from u", UNION_UP, "duckdb")
+    assert f.star_from == {"db.s.a"}
+    assert f.explicit["db.s.b"] == {"id", "x"}
+
+
+def test_column_read_through_union_of_stars():
+    f = analyse_model("with u as (select * from db.s.a union all select * from db.s.b) select x from u", UNION_UP, "duckdb")
+    assert f.explicit == {"db.s.a": {"x"}, "db.s.b": {"x"}}

@@ -103,13 +103,21 @@ def _stars(scope: Scope) -> list[exp.Expression]:
             if isinstance(s, exp.Star) or (isinstance(s, exp.Column) and isinstance(s.this, exp.Star))]
 
 
+def _branches(scope: Scope) -> list[Scope]:
+    """The SELECT scopes behind a scope: itself, or every branch of a UNION / INTERSECT / EXCEPT."""
+    if scope.set_operation_scopes:
+        return [b for u in scope.set_operation_scopes for b in _branches(u)]
+    return [scope]
+
+
 def _star_relations(scope: Scope, dialect: str) -> set[str]:
     rels: set[str] = set()
-    for star in _stars(scope):
-        alias = star.table if isinstance(star, exp.Column) else None
-        sources = [scope.sources.get(alias)] if alias else list(scope.sources.values())
-        for src in sources:
-            rels |= _star_source_relations(src, dialect)
+    for branch in _branches(scope):
+        for star in _stars(branch):
+            alias = star.table if isinstance(star, exp.Column) else None
+            sources = [branch.sources.get(alias)] if alias else list(branch.sources.values())
+            for src in sources:
+                rels |= _star_source_relations(src, dialect)
     return rels
 
 
@@ -136,15 +144,16 @@ def _resolve(scope: Scope, alias: str, name: str, dialect: str, depth: int = 0) 
     if isinstance(src, exp.Table):
         return [(relation_key(src, dialect), name.lower())]
     if isinstance(src, Scope):
-        # Named in the CTE's own SELECT -> that scope already recorded its inputs.
-        if any(s.alias_or_name.lower() == name.lower() for s in src.expression.selects if not isinstance(s, exp.Star)):
-            return []
         out: list[tuple[str, str]] = []
-        for star in _stars(src):
-            star_alias = star.table if isinstance(star, exp.Column) else None
-            aliases = [star_alias] if star_alias else list(src.sources)
-            for a in aliases:
-                out += _resolve(src, a, name, dialect, depth + 1)
+        for branch in _branches(src):
+            # Named in the branch's own SELECT -> that scope already recorded its inputs.
+            if any(s.alias_or_name.lower() == name.lower() for s in branch.expression.selects if not isinstance(s, exp.Star)):
+                continue
+            for star in _stars(branch):
+                star_alias = star.table if isinstance(star, exp.Column) else None
+                aliases = [star_alias] if star_alias else list(branch.sources)
+                for a in aliases:
+                    out += _resolve(branch, a, name, dialect, depth + 1)
         return out
     return []
 
