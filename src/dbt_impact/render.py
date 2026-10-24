@@ -21,7 +21,7 @@ def to_markdown(rep: Report) -> str:
     if rep.has_breaking:
         contract = f", **{len(rep.contract_issues)} contract violation(s)**" if rep.contract_issues else ""
         lines.append(f"**{len(breaking)} breaking reference(s)**{contract} and **{len(rep.exposures)} exposure(s) at risk**.")
-    elif rep.column_changes or rep.modified_models:
+    elif rep.column_changes or rep.modified_models or rep.semantic_changes:
         lines.append("No breaking downstream references found.")
     else:
         lines.append("No model or column changes detected.")
@@ -49,6 +49,12 @@ def to_markdown(rep: Report) -> str:
             nodes = ", ".join(f"`{n}`" for n in e.node.split(", "))
             cols = ", ".join(f"`{c}`" for c in e.columns)
             lines.append(f"| `{e.exposure}` | {e.type} | {e.owner or '-'} | {nodes} | {e.reason} | {cols} |")
+        lines.append("")
+    if rep.semantic_changes:
+        lines += ["### Behaviour changes", "", "No columns changed, but these settings change what the data means:", "",
+                  "| Node | Setting | Before | After | Why it matters |", "|---|---|---|---|---|"]
+        lines += [f"| `{c.node}` | `{c.setting}` | {c.before if c.before is not None else '-'} | "
+                  f"{c.after if c.after is not None else '-'} | {c.note} |" for c in rep.semantic_changes]
         lines.append("")
     if propagated:
         lines += ["### Propagated through `select *`", "",

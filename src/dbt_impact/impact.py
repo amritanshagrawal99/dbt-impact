@@ -45,6 +45,28 @@ class ContractIssue:
 
 
 @dataclass
+class SemanticChange:
+    node: str
+    setting: str
+    before: object
+    after: object
+    note: str
+
+
+_NOTES = {
+    "snapshot.unique_key": "Existing history was keyed on the old value; new rows will not line up with old ones.",
+    "snapshot.strategy": "Change detection works differently from the next run; expect a burst of new versions.",
+    "snapshot.updated_at": "Versions are now ordered by a different column.",
+    "snapshot.check_cols": "A different set of columns now creates a new version.",
+    "snapshot.invalidate_hard_deletes": "Deleted source rows are handled differently.",
+    "snapshot.hard_deletes": "Deleted source rows are handled differently.",
+    "freshness.warn_after": "Late-data warning threshold changed.",
+    "freshness.error_after": "Late-data error threshold changed.",
+    "freshness.loaded_at_field": "Freshness is now measured on a different column.",
+}
+
+
+@dataclass
 class Report:
     added_models: list[str] = field(default_factory=list)
     removed_models: list[str] = field(default_factory=list)
@@ -55,6 +77,7 @@ class Report:
     exposures: list[ExposureRisk] = field(default_factory=list)
     unanalysed: dict[str, str] = field(default_factory=dict)
     contract_issues: list[ContractIssue] = field(default_factory=list)
+    semantic_changes: list[SemanticChange] = field(default_factory=list)
 
     @property
     def breaking(self) -> list[Impact]:
@@ -119,6 +142,14 @@ def compare(base: Manifest, current: Manifest) -> Report:
         removed_cols += [(old, c) for c in gone]
 
     rep.contract_issues = _contracts(base, current, cur_facts)
+    for uid, node in current.nodes.items():
+        old = base.nodes.get(uid)
+        if old is None:
+            continue
+        for key in sorted(set(old.semantics) | set(node.semantics)):
+            if old.semantics.get(key) != node.semantics.get(key):
+                rep.semantic_changes.append(SemanticChange(node.name, key, old.semantics.get(key), node.semantics.get(key),
+                                                           _NOTES.get(key, "")))
 
     # Trace from the most upstream change first, so propagated removals are credited to their origin.
     order = {n.unique_id: i for i, n in enumerate(base.topo_order())}
