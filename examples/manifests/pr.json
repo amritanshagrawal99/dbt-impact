@@ -1,0 +1,1353 @@
+{
+ "child_map": {
+  "exposure.shop.crm_sync": [],
+  "exposure.shop.revenue_dashboard": [],
+  "model.shop.customer_contacts": [
+   "exposure.shop.crm_sync"
+  ],
+  "model.shop.customers": [
+   "exposure.shop.revenue_dashboard"
+  ],
+  "model.shop.orders": [
+   "exposure.shop.revenue_dashboard",
+   "model.shop.customers"
+  ],
+  "model.shop.stg_customers": [
+   "model.shop.customer_contacts",
+   "model.shop.customers"
+  ],
+  "model.shop.stg_orders": [
+   "model.shop.orders"
+  ],
+  "model.shop.stg_payments": [
+   "model.shop.orders"
+  ],
+  "seed.shop.raw_customers": [
+   "model.shop.stg_customers"
+  ],
+  "seed.shop.raw_orders": [
+   "model.shop.stg_orders"
+  ],
+  "seed.shop.raw_payments": [
+   "model.shop.stg_payments"
+  ]
+ },
+ "disabled": {},
+ "docs": {},
+ "exposures": {
+  "exposure.shop.crm_sync": {
+   "config": {
+    "enabled": true,
+    "meta": {},
+    "tags": []
+   },
+   "created_at": 1792838203.150413,
+   "depends_on": {
+    "macros": [],
+    "nodes": [
+     "model.shop.customer_contacts"
+    ]
+   },
+   "description": "",
+   "fqn": [
+    "shop",
+    "marts",
+    "crm_sync"
+   ],
+   "label": null,
+   "maturity": null,
+   "meta": {},
+   "metrics": [],
+   "name": "crm_sync",
+   "original_file_path": "models\\marts\\exposures.yml",
+   "owner": {
+    "email": "crm@example.com",
+    "name": "CRM team"
+   },
+   "package_name": "shop",
+   "path": "marts\\exposures.yml",
+   "refs": [
+    {
+     "name": "customer_contacts",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "exposure",
+   "sources": [],
+   "tags": [],
+   "type": "application",
+   "unique_id": "exposure.shop.crm_sync",
+   "unrendered_config": {},
+   "url": null
+  },
+  "exposure.shop.revenue_dashboard": {
+   "config": {
+    "enabled": true,
+    "meta": {},
+    "tags": []
+   },
+   "created_at": 1792838203.144487,
+   "depends_on": {
+    "macros": [],
+    "nodes": [
+     "model.shop.customers",
+     "model.shop.orders"
+    ]
+   },
+   "description": "",
+   "fqn": [
+    "shop",
+    "marts",
+    "revenue_dashboard"
+   ],
+   "label": null,
+   "maturity": null,
+   "meta": {},
+   "metrics": [],
+   "name": "revenue_dashboard",
+   "original_file_path": "models\\marts\\exposures.yml",
+   "owner": {
+    "email": "analytics@example.com",
+    "name": "Analytics"
+   },
+   "package_name": "shop",
+   "path": "marts\\exposures.yml",
+   "refs": [
+    {
+     "name": "customers",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "orders",
+     "package": null,
+     "version": null
+    }
+   ],
+   "resource_type": "exposure",
+   "sources": [],
+   "tags": [],
+   "type": "dashboard",
+   "unique_id": "exposure.shop.revenue_dashboard",
+   "unrendered_config": {},
+   "url": null
+  }
+ },
+ "functions": {},
+ "group_map": {},
+ "groups": {},
+ "macros": {},
+ "metadata": {
+  "adapter_type": "duckdb",
+  "dbt_schema_version": "https://schemas.getdbt.com/dbt/manifest/v12.json",
+  "dbt_version": "1.12.6",
+  "project_id": "fb54f3c5992b96d001bb16e8e92d968d",
+  "project_name": "shop",
+  "quoting": {
+   "column": null,
+   "database": true,
+   "identifier": true,
+   "schema": true
+  },
+  "run_started_at": "2026-10-24T10:36:40.888997+00:00",
+  "send_anonymous_usage_stats": true
+ },
+ "metrics": {},
+ "nodes": {
+  "model.shop.customer_contacts": {
+   "access": "protected",
+   "alias": "customer_contacts",
+   "build_path": null,
+   "checksum": {
+    "checksum": "bfb27ebb09277af1884039b6551d67b284c583dc89f0e37d903b5203629f42d4",
+    "name": "sha256"
+   },
+   "columns": {},
+   "compiled": true,
+   "compiled_code": "select customer_id, email\nfrom \"shop\".\"main\".\"stg_customers\"\nwhere email is not null",
+   "compiled_path": "target\\compiled\\shop\\models\\marts\\customer_contacts.sql",
+   "config": {
+    "access": "protected",
+    "alias": null,
+    "batch_size": null,
+    "begin": null,
+    "column_types": {},
+    "concurrent_batches": null,
+    "contract": {
+     "alias_types": true,
+     "enforced": false
+    },
+    "database": null,
+    "docs": {
+     "node_color": null,
+     "show": true
+    },
+    "enabled": true,
+    "event_time": null,
+    "freshness": null,
+    "full_refresh": null,
+    "grants": {},
+    "group": null,
+    "incremental_strategy": null,
+    "latest_version_pointer": {
+     "alias": null,
+     "enabled": null
+    },
+    "lookback": 1,
+    "materialized": "table",
+    "meta": {},
+    "on_configuration_change": "apply",
+    "on_error": null,
+    "on_schema_change": "ignore",
+    "packages": [],
+    "persist_docs": {},
+    "post-hook": [],
+    "pre-hook": [],
+    "quoting": {},
+    "schema": null,
+    "static_analysis": null,
+    "tags": [],
+    "unique_key": null
+   },
+   "constraints": [],
+   "contract": {
+    "alias_types": true,
+    "checksum": null,
+    "enforced": false
+   },
+   "created_at": 1792838202.9563105,
+   "database": "shop",
+   "depends_on": {
+    "macros": [],
+    "nodes": [
+     "model.shop.stg_customers"
+    ]
+   },
+   "deprecation_date": null,
+   "description": "",
+   "doc_blocks": [],
+   "docs": {
+    "node_color": null,
+    "show": true
+   },
+   "extra_ctes": [],
+   "extra_ctes_injected": true,
+   "fqn": [
+    "shop",
+    "marts",
+    "customer_contacts"
+   ],
+   "functions": [],
+   "group": null,
+   "language": "sql",
+   "latest_version": null,
+   "meta": {},
+   "metrics": [],
+   "name": "customer_contacts",
+   "original_file_path": "models\\marts\\customer_contacts.sql",
+   "package_name": "shop",
+   "patch_path": null,
+   "path": "marts\\customer_contacts.sql",
+   "primary_key": [],
+   "raw_code": "select customer_id, email\nfrom {{ ref('stg_customers') }}\nwhere email is not null",
+   "refs": [
+    {
+     "name": "stg_customers",
+     "package": null,
+     "version": null
+    }
+   ],
+   "relation_name": "\"shop\".\"main\".\"customer_contacts\"",
+   "resource_type": "model",
+   "schema": "main",
+   "sources": [],
+   "tags": [],
+   "time_spine": null,
+   "unique_id": "model.shop.customer_contacts",
+   "unrendered_config": {
+    "materialized": "table"
+   },
+   "version": null
+  },
+  "model.shop.customers": {
+   "access": "protected",
+   "alias": "customers",
+   "build_path": null,
+   "checksum": {
+    "checksum": "687ffcca6005c5281175db03450fcb02d425c062eca9cb6b71d1b726b0d87eaf",
+    "name": "sha256"
+   },
+   "columns": {},
+   "compiled": true,
+   "compiled_code": "with order_stats as (\n    select\n        customer_id,\n        min(order_date) as first_order_date,\n        count(*) as order_count,\n        sum(case when status = 'completed' then amount else 0 end) as lifetime_value\n    from \"shop\".\"main\".\"orders\"\n    group by customer_id\n)\nselect\n    c.customer_id,\n    c.first_name || ' ' || c.last_name as full_name,\n    c.signup_date,\n    s.first_order_date,\n    coalesce(s.order_count, 0) as order_count,\n    coalesce(s.lifetime_value, 0) as lifetime_value\nfrom \"shop\".\"main\".\"stg_customers\" c\nleft join order_stats s on s.customer_id = c.customer_id",
+   "compiled_path": "target\\compiled\\shop\\models\\marts\\customers.sql",
+   "config": {
+    "access": "protected",
+    "alias": null,
+    "batch_size": null,
+    "begin": null,
+    "column_types": {},
+    "concurrent_batches": null,
+    "contract": {
+     "alias_types": true,
+     "enforced": false
+    },
+    "database": null,
+    "docs": {
+     "node_color": null,
+     "show": true
+    },
+    "enabled": true,
+    "event_time": null,
+    "freshness": null,
+    "full_refresh": null,
+    "grants": {},
+    "group": null,
+    "incremental_strategy": null,
+    "latest_version_pointer": {
+     "alias": null,
+     "enabled": null
+    },
+    "lookback": 1,
+    "materialized": "table",
+    "meta": {},
+    "on_configuration_change": "apply",
+    "on_error": null,
+    "on_schema_change": "ignore",
+    "packages": [],
+    "persist_docs": {},
+    "post-hook": [],
+    "pre-hook": [],
+    "quoting": {},
+    "schema": null,
+    "static_analysis": null,
+    "tags": [],
+    "unique_key": null
+   },
+   "constraints": [],
+   "contract": {
+    "alias_types": true,
+    "checksum": null,
+    "enforced": false
+   },
+   "created_at": 1792838202.9280393,
+   "database": "shop",
+   "depends_on": {
+    "macros": [],
+    "nodes": [
+     "model.shop.orders",
+     "model.shop.stg_customers"
+    ]
+   },
+   "deprecation_date": null,
+   "description": "",
+   "doc_blocks": [],
+   "docs": {
+    "node_color": null,
+    "show": true
+   },
+   "extra_ctes": [],
+   "extra_ctes_injected": true,
+   "fqn": [
+    "shop",
+    "marts",
+    "customers"
+   ],
+   "functions": [],
+   "group": null,
+   "language": "sql",
+   "latest_version": null,
+   "meta": {},
+   "metrics": [],
+   "name": "customers",
+   "original_file_path": "models\\marts\\customers.sql",
+   "package_name": "shop",
+   "patch_path": null,
+   "path": "marts\\customers.sql",
+   "primary_key": [],
+   "raw_code": "with order_stats as (\n    select\n        customer_id,\n        min(order_date) as first_order_date,\n        count(*) as order_count,\n        sum(case when status = 'completed' then amount else 0 end) as lifetime_value\n    from {{ ref('orders') }}\n    group by customer_id\n)\nselect\n    c.customer_id,\n    c.first_name || ' ' || c.last_name as full_name,\n    c.signup_date,\n    s.first_order_date,\n    coalesce(s.order_count, 0) as order_count,\n    coalesce(s.lifetime_value, 0) as lifetime_value\nfrom {{ ref('stg_customers') }} c\nleft join order_stats s on s.customer_id = c.customer_id",
+   "refs": [
+    {
+     "name": "orders",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "stg_customers",
+     "package": null,
+     "version": null
+    }
+   ],
+   "relation_name": "\"shop\".\"main\".\"customers\"",
+   "resource_type": "model",
+   "schema": "main",
+   "sources": [],
+   "tags": [],
+   "time_spine": null,
+   "unique_id": "model.shop.customers",
+   "unrendered_config": {
+    "materialized": "table"
+   },
+   "version": null
+  },
+  "model.shop.orders": {
+   "access": "protected",
+   "alias": "orders",
+   "build_path": null,
+   "checksum": {
+    "checksum": "89369c5d7cb3a41afef2116e6c2115a0061ec3594ba313db386c6aaecdfb50f7",
+    "name": "sha256"
+   },
+   "columns": {},
+   "compiled": true,
+   "compiled_code": "with payments as (\n    select order_id, sum(amount) as amount\n    from \"shop\".\"main\".\"stg_payments\"\n    group by order_id\n)\nselect o.*, p.amount\nfrom \"shop\".\"main\".\"stg_orders\" o\nleft join payments p on p.order_id = o.order_id",
+   "compiled_path": "target\\compiled\\shop\\models\\marts\\orders.sql",
+   "config": {
+    "access": "protected",
+    "alias": null,
+    "batch_size": null,
+    "begin": null,
+    "column_types": {},
+    "concurrent_batches": null,
+    "contract": {
+     "alias_types": true,
+     "enforced": false
+    },
+    "database": null,
+    "docs": {
+     "node_color": null,
+     "show": true
+    },
+    "enabled": true,
+    "event_time": null,
+    "freshness": null,
+    "full_refresh": null,
+    "grants": {},
+    "group": null,
+    "incremental_strategy": null,
+    "latest_version_pointer": {
+     "alias": null,
+     "enabled": null
+    },
+    "lookback": 1,
+    "materialized": "table",
+    "meta": {},
+    "on_configuration_change": "apply",
+    "on_error": null,
+    "on_schema_change": "ignore",
+    "packages": [],
+    "persist_docs": {},
+    "post-hook": [],
+    "pre-hook": [],
+    "quoting": {},
+    "schema": null,
+    "static_analysis": null,
+    "tags": [],
+    "unique_key": null
+   },
+   "constraints": [],
+   "contract": {
+    "alias_types": true,
+    "checksum": null,
+    "enforced": false
+   },
+   "created_at": 1792838202.9598987,
+   "database": "shop",
+   "depends_on": {
+    "macros": [],
+    "nodes": [
+     "model.shop.stg_payments",
+     "model.shop.stg_orders"
+    ]
+   },
+   "deprecation_date": null,
+   "description": "",
+   "doc_blocks": [],
+   "docs": {
+    "node_color": null,
+    "show": true
+   },
+   "extra_ctes": [],
+   "extra_ctes_injected": true,
+   "fqn": [
+    "shop",
+    "marts",
+    "orders"
+   ],
+   "functions": [],
+   "group": null,
+   "language": "sql",
+   "latest_version": null,
+   "meta": {},
+   "metrics": [],
+   "name": "orders",
+   "original_file_path": "models\\marts\\orders.sql",
+   "package_name": "shop",
+   "patch_path": null,
+   "path": "marts\\orders.sql",
+   "primary_key": [],
+   "raw_code": "with payments as (\n    select order_id, sum(amount) as amount\n    from {{ ref('stg_payments') }}\n    group by order_id\n)\nselect o.*, p.amount\nfrom {{ ref('stg_orders') }} o\nleft join payments p on p.order_id = o.order_id",
+   "refs": [
+    {
+     "name": "stg_payments",
+     "package": null,
+     "version": null
+    },
+    {
+     "name": "stg_orders",
+     "package": null,
+     "version": null
+    }
+   ],
+   "relation_name": "\"shop\".\"main\".\"orders\"",
+   "resource_type": "model",
+   "schema": "main",
+   "sources": [],
+   "tags": [],
+   "time_spine": null,
+   "unique_id": "model.shop.orders",
+   "unrendered_config": {
+    "materialized": "table"
+   },
+   "version": null
+  },
+  "model.shop.stg_customers": {
+   "access": "protected",
+   "alias": "stg_customers",
+   "build_path": null,
+   "checksum": {
+    "checksum": "034d8b90e830c5d60059c9008b4598c8c648b7b56d262ae334fa5f053fd780cf",
+    "name": "sha256"
+   },
+   "columns": {},
+   "compiled": true,
+   "compiled_code": "select\n    id as customer_id,\n    first_name as given_name,\n    last_name,\n    cast(signup_date as date) as signup_date\nfrom \"shop\".\"main\".\"raw_customers\"",
+   "compiled_path": "target\\compiled\\shop\\models\\staging\\stg_customers.sql",
+   "config": {
+    "access": "protected",
+    "alias": null,
+    "batch_size": null,
+    "begin": null,
+    "column_types": {},
+    "concurrent_batches": null,
+    "contract": {
+     "alias_types": true,
+     "enforced": false
+    },
+    "database": null,
+    "docs": {
+     "node_color": null,
+     "show": true
+    },
+    "enabled": true,
+    "event_time": null,
+    "freshness": null,
+    "full_refresh": null,
+    "grants": {},
+    "group": null,
+    "incremental_strategy": null,
+    "latest_version_pointer": {
+     "alias": null,
+     "enabled": null
+    },
+    "lookback": 1,
+    "materialized": "view",
+    "meta": {},
+    "on_configuration_change": "apply",
+    "on_error": null,
+    "on_schema_change": "ignore",
+    "packages": [],
+    "persist_docs": {},
+    "post-hook": [],
+    "pre-hook": [],
+    "quoting": {},
+    "schema": null,
+    "static_analysis": null,
+    "tags": [],
+    "unique_key": null
+   },
+   "constraints": [],
+   "contract": {
+    "alias_types": true,
+    "checksum": null,
+    "enforced": false
+   },
+   "created_at": 1792838210.4155855,
+   "database": "shop",
+   "depends_on": {
+    "macros": [],
+    "nodes": [
+     "seed.shop.raw_customers"
+    ]
+   },
+   "deprecation_date": null,
+   "description": "",
+   "doc_blocks": [],
+   "docs": {
+    "node_color": null,
+    "show": true
+   },
+   "extra_ctes": [],
+   "extra_ctes_injected": true,
+   "fqn": [
+    "shop",
+    "staging",
+    "stg_customers"
+   ],
+   "functions": [],
+   "group": null,
+   "language": "sql",
+   "latest_version": null,
+   "meta": {},
+   "metrics": [],
+   "name": "stg_customers",
+   "original_file_path": "models\\staging\\stg_customers.sql",
+   "package_name": "shop",
+   "patch_path": null,
+   "path": "staging\\stg_customers.sql",
+   "primary_key": [],
+   "raw_code": "select\r\n    id as customer_id,\r\n    first_name as given_name,\r\n    last_name,\r\n    cast(signup_date as date) as signup_date\r\nfrom {{ ref('raw_customers') }}",
+   "refs": [
+    {
+     "name": "raw_customers",
+     "package": null,
+     "version": null
+    }
+   ],
+   "relation_name": "\"shop\".\"main\".\"stg_customers\"",
+   "resource_type": "model",
+   "schema": "main",
+   "sources": [],
+   "tags": [],
+   "time_spine": null,
+   "unique_id": "model.shop.stg_customers",
+   "unrendered_config": {
+    "materialized": "view"
+   },
+   "version": null
+  },
+  "model.shop.stg_orders": {
+   "access": "protected",
+   "alias": "stg_orders",
+   "build_path": null,
+   "checksum": {
+    "checksum": "17e30396d3bd91ee1a43abd452daae7d27f460ec30ce797875ca0d3624615fe0",
+    "name": "sha256"
+   },
+   "columns": {},
+   "compiled": true,
+   "compiled_code": "select\n    id as order_id,\n    customer_id,\n    cast(order_date as date) as order_date\nfrom \"shop\".\"main\".\"raw_orders\"",
+   "compiled_path": "target\\compiled\\shop\\models\\staging\\stg_orders.sql",
+   "config": {
+    "access": "protected",
+    "alias": null,
+    "batch_size": null,
+    "begin": null,
+    "column_types": {},
+    "concurrent_batches": null,
+    "contract": {
+     "alias_types": true,
+     "enforced": false
+    },
+    "database": null,
+    "docs": {
+     "node_color": null,
+     "show": true
+    },
+    "enabled": true,
+    "event_time": null,
+    "freshness": null,
+    "full_refresh": null,
+    "grants": {},
+    "group": null,
+    "incremental_strategy": null,
+    "latest_version_pointer": {
+     "alias": null,
+     "enabled": null
+    },
+    "lookback": 1,
+    "materialized": "view",
+    "meta": {},
+    "on_configuration_change": "apply",
+    "on_error": null,
+    "on_schema_change": "ignore",
+    "packages": [],
+    "persist_docs": {},
+    "post-hook": [],
+    "pre-hook": [],
+    "quoting": {},
+    "schema": null,
+    "static_analysis": null,
+    "tags": [],
+    "unique_key": null
+   },
+   "constraints": [],
+   "contract": {
+    "alias_types": true,
+    "checksum": null,
+    "enforced": false
+   },
+   "created_at": 1792838210.4356706,
+   "database": "shop",
+   "depends_on": {
+    "macros": [],
+    "nodes": [
+     "seed.shop.raw_orders"
+    ]
+   },
+   "deprecation_date": null,
+   "description": "",
+   "doc_blocks": [],
+   "docs": {
+    "node_color": null,
+    "show": true
+   },
+   "extra_ctes": [],
+   "extra_ctes_injected": true,
+   "fqn": [
+    "shop",
+    "staging",
+    "stg_orders"
+   ],
+   "functions": [],
+   "group": null,
+   "language": "sql",
+   "latest_version": null,
+   "meta": {},
+   "metrics": [],
+   "name": "stg_orders",
+   "original_file_path": "models\\staging\\stg_orders.sql",
+   "package_name": "shop",
+   "patch_path": null,
+   "path": "staging\\stg_orders.sql",
+   "primary_key": [],
+   "raw_code": "select\r\n    id as order_id,\r\n    customer_id,\r\n    cast(order_date as date) as order_date\r\nfrom {{ ref('raw_orders') }}",
+   "refs": [
+    {
+     "name": "raw_orders",
+     "package": null,
+     "version": null
+    }
+   ],
+   "relation_name": "\"shop\".\"main\".\"stg_orders\"",
+   "resource_type": "model",
+   "schema": "main",
+   "sources": [],
+   "tags": [],
+   "time_spine": null,
+   "unique_id": "model.shop.stg_orders",
+   "unrendered_config": {
+    "materialized": "view"
+   },
+   "version": null
+  },
+  "model.shop.stg_payments": {
+   "access": "protected",
+   "alias": "stg_payments",
+   "build_path": null,
+   "checksum": {
+    "checksum": "c8466d0b22c1c90d7fb5281bb4e18977bf6bc88f7d193c5be9e25a9aa166780d",
+    "name": "sha256"
+   },
+   "columns": {},
+   "compiled": true,
+   "compiled_code": "select\n    id as payment_id,\n    order_id,\n    method as payment_method,\n    amount_paise / 100.0 as amount\nfrom \"shop\".\"main\".\"raw_payments\"",
+   "compiled_path": "target\\compiled\\shop\\models\\staging\\stg_payments.sql",
+   "config": {
+    "access": "protected",
+    "alias": null,
+    "batch_size": null,
+    "begin": null,
+    "column_types": {},
+    "concurrent_batches": null,
+    "contract": {
+     "alias_types": true,
+     "enforced": false
+    },
+    "database": null,
+    "docs": {
+     "node_color": null,
+     "show": true
+    },
+    "enabled": true,
+    "event_time": null,
+    "freshness": null,
+    "full_refresh": null,
+    "grants": {},
+    "group": null,
+    "incremental_strategy": null,
+    "latest_version_pointer": {
+     "alias": null,
+     "enabled": null
+    },
+    "lookback": 1,
+    "materialized": "view",
+    "meta": {},
+    "on_configuration_change": "apply",
+    "on_error": null,
+    "on_schema_change": "ignore",
+    "packages": [],
+    "persist_docs": {},
+    "post-hook": [],
+    "pre-hook": [],
+    "quoting": {},
+    "schema": null,
+    "static_analysis": null,
+    "tags": [],
+    "unique_key": null
+   },
+   "constraints": [],
+   "contract": {
+    "alias_types": true,
+    "checksum": null,
+    "enforced": false
+   },
+   "created_at": 1792838202.9696727,
+   "database": "shop",
+   "depends_on": {
+    "macros": [],
+    "nodes": [
+     "seed.shop.raw_payments"
+    ]
+   },
+   "deprecation_date": null,
+   "description": "",
+   "doc_blocks": [],
+   "docs": {
+    "node_color": null,
+    "show": true
+   },
+   "extra_ctes": [],
+   "extra_ctes_injected": true,
+   "fqn": [
+    "shop",
+    "staging",
+    "stg_payments"
+   ],
+   "functions": [],
+   "group": null,
+   "language": "sql",
+   "latest_version": null,
+   "meta": {},
+   "metrics": [],
+   "name": "stg_payments",
+   "original_file_path": "models\\staging\\stg_payments.sql",
+   "package_name": "shop",
+   "patch_path": null,
+   "path": "staging\\stg_payments.sql",
+   "primary_key": [],
+   "raw_code": "select\n    id as payment_id,\n    order_id,\n    method as payment_method,\n    amount_paise / 100.0 as amount\nfrom {{ ref('raw_payments') }}",
+   "refs": [
+    {
+     "name": "raw_payments",
+     "package": null,
+     "version": null
+    }
+   ],
+   "relation_name": "\"shop\".\"main\".\"stg_payments\"",
+   "resource_type": "model",
+   "schema": "main",
+   "sources": [],
+   "tags": [],
+   "time_spine": null,
+   "unique_id": "model.shop.stg_payments",
+   "unrendered_config": {
+    "materialized": "view"
+   },
+   "version": null
+  },
+  "seed.shop.raw_customers": {
+   "alias": "raw_customers",
+   "build_path": null,
+   "checksum": {
+    "checksum": "838caedbf1f713d2e6982ce17e7c0878a6d2257adbc920ed86c86f67f1ff11c0",
+    "name": "sha256"
+   },
+   "columns": {
+    "email": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "email",
+     "quote": null,
+     "tags": []
+    },
+    "first_name": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "first_name",
+     "quote": null,
+     "tags": []
+    },
+    "id": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "id",
+     "quote": null,
+     "tags": []
+    },
+    "last_name": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "last_name",
+     "quote": null,
+     "tags": []
+    },
+    "signup_date": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "signup_date",
+     "quote": null,
+     "tags": []
+    }
+   },
+   "config": {
+    "alias": null,
+    "batch_size": null,
+    "begin": null,
+    "column_types": {},
+    "concurrent_batches": null,
+    "contract": {
+     "alias_types": true,
+     "enforced": false
+    },
+    "database": null,
+    "delimiter": ",",
+    "docs": {
+     "node_color": null,
+     "show": true
+    },
+    "enabled": true,
+    "event_time": null,
+    "full_refresh": null,
+    "grants": {},
+    "group": null,
+    "incremental_strategy": null,
+    "lookback": 1,
+    "materialized": "seed",
+    "meta": {},
+    "on_configuration_change": "apply",
+    "on_schema_change": "ignore",
+    "packages": [],
+    "persist_docs": {},
+    "post-hook": [],
+    "pre-hook": [],
+    "quote_columns": null,
+    "quoting": {},
+    "schema": null,
+    "static_analysis": null,
+    "tags": [],
+    "unique_key": null
+   },
+   "created_at": 1792838203.1989582,
+   "database": "shop",
+   "depends_on": {
+    "macros": []
+   },
+   "description": "",
+   "doc_blocks": [],
+   "docs": {
+    "node_color": null,
+    "show": true
+   },
+   "fqn": [
+    "shop",
+    "raw_customers"
+   ],
+   "group": null,
+   "meta": {},
+   "name": "raw_customers",
+   "original_file_path": "seeds\\raw_customers.csv",
+   "package_name": "shop",
+   "patch_path": "shop://seeds\\schema.yml",
+   "path": "raw_customers.csv",
+   "raw_code": "",
+   "relation_name": "\"shop\".\"main\".\"raw_customers\"",
+   "resource_type": "seed",
+   "root_path": ".",
+   "schema": "main",
+   "tags": [],
+   "unique_id": "seed.shop.raw_customers",
+   "unrendered_config": {}
+  },
+  "seed.shop.raw_orders": {
+   "alias": "raw_orders",
+   "build_path": null,
+   "checksum": {
+    "checksum": "1f6fd276ccf51f165e9a0551e99199ba88908316357c0c892a773920c47d25f2",
+    "name": "sha256"
+   },
+   "columns": {
+    "customer_id": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "customer_id",
+     "quote": null,
+     "tags": []
+    },
+    "id": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "id",
+     "quote": null,
+     "tags": []
+    },
+    "order_date": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "order_date",
+     "quote": null,
+     "tags": []
+    },
+    "status": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "status",
+     "quote": null,
+     "tags": []
+    }
+   },
+   "config": {
+    "alias": null,
+    "batch_size": null,
+    "begin": null,
+    "column_types": {},
+    "concurrent_batches": null,
+    "contract": {
+     "alias_types": true,
+     "enforced": false
+    },
+    "database": null,
+    "delimiter": ",",
+    "docs": {
+     "node_color": null,
+     "show": true
+    },
+    "enabled": true,
+    "event_time": null,
+    "full_refresh": null,
+    "grants": {},
+    "group": null,
+    "incremental_strategy": null,
+    "lookback": 1,
+    "materialized": "seed",
+    "meta": {},
+    "on_configuration_change": "apply",
+    "on_schema_change": "ignore",
+    "packages": [],
+    "persist_docs": {},
+    "post-hook": [],
+    "pre-hook": [],
+    "quote_columns": null,
+    "quoting": {},
+    "schema": null,
+    "static_analysis": null,
+    "tags": [],
+    "unique_key": null
+   },
+   "created_at": 1792838203.1989582,
+   "database": "shop",
+   "depends_on": {
+    "macros": []
+   },
+   "description": "",
+   "doc_blocks": [],
+   "docs": {
+    "node_color": null,
+    "show": true
+   },
+   "fqn": [
+    "shop",
+    "raw_orders"
+   ],
+   "group": null,
+   "meta": {},
+   "name": "raw_orders",
+   "original_file_path": "seeds\\raw_orders.csv",
+   "package_name": "shop",
+   "patch_path": "shop://seeds\\schema.yml",
+   "path": "raw_orders.csv",
+   "raw_code": "",
+   "relation_name": "\"shop\".\"main\".\"raw_orders\"",
+   "resource_type": "seed",
+   "root_path": ".",
+   "schema": "main",
+   "tags": [],
+   "unique_id": "seed.shop.raw_orders",
+   "unrendered_config": {}
+  },
+  "seed.shop.raw_payments": {
+   "alias": "raw_payments",
+   "build_path": null,
+   "checksum": {
+    "checksum": "aa934f033e32ae5f0a0cbe88a48d159e50719de010dbe2f3b16aedb54e71fdf7",
+    "name": "sha256"
+   },
+   "columns": {
+    "amount_paise": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "amount_paise",
+     "quote": null,
+     "tags": []
+    },
+    "id": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "id",
+     "quote": null,
+     "tags": []
+    },
+    "method": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "method",
+     "quote": null,
+     "tags": []
+    },
+    "order_id": {
+     "config": {
+      "meta": {},
+      "tags": []
+     },
+     "constraints": [],
+     "data_type": null,
+     "description": "",
+     "dimension": null,
+     "doc_blocks": [],
+     "entity": null,
+     "granularity": null,
+     "meta": {},
+     "name": "order_id",
+     "quote": null,
+     "tags": []
+    }
+   },
+   "config": {
+    "alias": null,
+    "batch_size": null,
+    "begin": null,
+    "column_types": {},
+    "concurrent_batches": null,
+    "contract": {
+     "alias_types": true,
+     "enforced": false
+    },
+    "database": null,
+    "delimiter": ",",
+    "docs": {
+     "node_color": null,
+     "show": true
+    },
+    "enabled": true,
+    "event_time": null,
+    "full_refresh": null,
+    "grants": {},
+    "group": null,
+    "incremental_strategy": null,
+    "lookback": 1,
+    "materialized": "seed",
+    "meta": {},
+    "on_configuration_change": "apply",
+    "on_schema_change": "ignore",
+    "packages": [],
+    "persist_docs": {},
+    "post-hook": [],
+    "pre-hook": [],
+    "quote_columns": null,
+    "quoting": {},
+    "schema": null,
+    "static_analysis": null,
+    "tags": [],
+    "unique_key": null
+   },
+   "created_at": 1792838203.2060196,
+   "database": "shop",
+   "depends_on": {
+    "macros": []
+   },
+   "description": "",
+   "doc_blocks": [],
+   "docs": {
+    "node_color": null,
+    "show": true
+   },
+   "fqn": [
+    "shop",
+    "raw_payments"
+   ],
+   "group": null,
+   "meta": {},
+   "name": "raw_payments",
+   "original_file_path": "seeds\\raw_payments.csv",
+   "package_name": "shop",
+   "patch_path": "shop://seeds\\schema.yml",
+   "path": "raw_payments.csv",
+   "raw_code": "",
+   "relation_name": "\"shop\".\"main\".\"raw_payments\"",
+   "resource_type": "seed",
+   "root_path": ".",
+   "schema": "main",
+   "tags": [],
+   "unique_id": "seed.shop.raw_payments",
+   "unrendered_config": {}
+  }
+ },
+ "parent_map": {
+  "exposure.shop.crm_sync": [
+   "model.shop.customer_contacts"
+  ],
+  "exposure.shop.revenue_dashboard": [
+   "model.shop.customers",
+   "model.shop.orders"
+  ],
+  "model.shop.customer_contacts": [
+   "model.shop.stg_customers"
+  ],
+  "model.shop.customers": [
+   "model.shop.orders",
+   "model.shop.stg_customers"
+  ],
+  "model.shop.orders": [
+   "model.shop.stg_orders",
+   "model.shop.stg_payments"
+  ],
+  "model.shop.stg_customers": [
+   "seed.shop.raw_customers"
+  ],
+  "model.shop.stg_orders": [
+   "seed.shop.raw_orders"
+  ],
+  "model.shop.stg_payments": [
+   "seed.shop.raw_payments"
+  ],
+  "seed.shop.raw_customers": [],
+  "seed.shop.raw_orders": [],
+  "seed.shop.raw_payments": []
+ },
+ "saved_queries": {},
+ "selectors": {},
+ "semantic_models": {},
+ "sources": {},
+ "unit_tests": {}
+}

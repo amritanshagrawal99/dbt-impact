@@ -1,0 +1,38 @@
+# .github/workflows/dbt-impact.yml in your dbt repository
+name: dbt impact
+
+on:
+  pull_request:
+    paths: ["models/**", "seeds/**", "snapshots/**", "dbt_project.yml"]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  impact:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: pr
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install dbt-snowflake   # your adapter
+      # dbt compile needs a connection for most adapters; use a CI service user with read access.
+      - run: |
+          (cd base && dbt deps && dbt compile --target ci)
+          (cd pr && dbt deps && dbt compile --target ci)
+        env:
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+          SNOWFLAKE_PASSWORD: ${{ secrets.SNOWFLAKE_PASSWORD }}
+      - uses: amritanshagrawal99/dbt-impact@main
+        with:
+          base-manifest: base/target/manifest.json
+          current-manifest: pr/target/manifest.json

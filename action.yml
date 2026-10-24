@@ -1,0 +1,71 @@
+name: dbt-impact
+description: Column-level impact analysis for dbt pull requests. Posts a sticky PR comment and can fail on breaking changes.
+branding:
+  icon: git-pull-request
+  color: orange
+inputs:
+  base-manifest:
+    description: Path to manifest.json from the base branch (or production)
+    required: true
+  current-manifest:
+    description: Path to manifest.json from the PR branch (after dbt compile)
+    required: true
+  base-catalog:
+    description: Optional catalog.json for the base branch
+    required: false
+    default: ""
+  current-catalog:
+    description: Optional catalog.json for the PR branch
+    required: false
+    default: ""
+  fail-on-breaking:
+    description: Fail the job when a downstream model or exposure breaks
+    required: false
+    default: "true"
+  comment:
+    description: Post (or update) a PR comment with the report
+    required: false
+    default: "true"
+outputs:
+  has-breaking:
+    description: '"true" when breaking changes were found'
+    value: ${{ steps.run.outputs.has-breaking }}
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: pip install --quiet "${{ github.action_path }}"
+    - id: run
+      shell: bash
+      env:
+        # Passed through env, not interpolated into the script, so paths can't inject shell.
+        BASE_MANIFEST: ${{ inputs.base-manifest }}
+        CURRENT_MANIFEST: ${{ inputs.current-manifest }}
+        BASE_CATALOG: ${{ inputs.base-catalog }}
+        CURRENT_CATALOG: ${{ inputs.current-catalog }}
+      run: |
+        args=(--base "$BASE_MANIFEST" --current "$CURRENT_MANIFEST")
+        if [ -n "$BASE_CATALOG" ]; then args+=(--base-catalog "$BASE_CATALOG"); fi
+        if [ -n "$CURRENT_CATALOG" ]; then args+=(--current-catalog "$CURRENT_CATALOG"); fi
+        dbt-impact "${args[@]}" -o dbt-impact.md
+        dbt-impact "${args[@]}" --format json -o dbt-impact.json
+        echo "has-breaking=$(python -c 'import json;print(str(json.load(open("dbt-impact.json"))["has_breaking"]).lower())')" >> "$GITHUB_OUTPUT"
+        cat dbt-impact.md >> "$GITHUB_STEP_SUMMARY"
+    - if: inputs.comment == 'true' && github.event_name == 'pull_request'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR: ${{ github.event.pull_request.number }}
+      run: |
+        id=$(gh api "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" --paginate \
+              --jq '.[] | select(.body | startswith("<!-- dbt-impact -->")) | .id' | head -n1)
+        if [ -n "$id" ]; then
+          gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${id}" -F body=@dbt-impact.md > /dev/null
+        else
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file dbt-impact.md
+        fi
+    - if: inputs.fail-on-breaking == 'true' && steps.run.outputs.has-breaking == 'true'
+      shell: bash
+      run: |
+        echo "::error::dbt-impact found breaking downstream changes (see the job summary)"
+        exit 1

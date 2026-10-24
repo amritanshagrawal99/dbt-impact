@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dbt-impact"
+version = "0.1.0"
+description = "Column-level impact analysis for dbt pull requests: find the downstream models and exposures a change breaks."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Amritansh Agrawal" }]
+requires-python = ">=3.10"
+dependencies = ["sqlglot>=30,<31"]
+keywords = ["dbt", "data-engineering", "lineage", "column-lineage", "ci", "sqlglot", "data-quality"]
+classifiers = ["Programming Language :: Python :: 3", "License :: OSI Approved :: MIT License", "Topic :: Database"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+dbt-impact = "dbt_impact.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dbt_impact"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E702"]
