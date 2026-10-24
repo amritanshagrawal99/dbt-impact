@@ -19,7 +19,8 @@ def to_markdown(rep: Report) -> str:
     lines = [MARKER, "## dbt impact analysis", ""]
     breaking, propagated = rep.breaking, [i for i in rep.impacts if i.kind == "propagates"]
     if rep.has_breaking:
-        lines.append(f"**{len(breaking)} breaking reference(s)** and **{len(rep.exposures)} exposure(s) at risk**.")
+        contract = f", **{len(rep.contract_issues)} contract violation(s)**" if rep.contract_issues else ""
+        lines.append(f"**{len(breaking)} breaking reference(s)**{contract} and **{len(rep.exposures)} exposure(s) at risk**.")
     elif rep.column_changes or rep.modified_models:
         lines.append("No breaking downstream references found.")
     else:
@@ -32,6 +33,12 @@ def to_markdown(rep: Report) -> str:
         lines += [f"| {k} | {', '.join(f'`{m}`' for m in v)} |" for k, v in summary if v]
         lines.append("")
 
+    if rep.contract_issues:
+        lines += ["### Contract violations", "",
+                  "These models have an enforced contract, so their columns are a public API and `dbt build` checks them.", "",
+                  "| Model | Column | Problem |", "|---|---|---|"]
+        lines += [f"| `{c.node}` | `{c.column}` | {c.detail} |" for c in rep.contract_issues]
+        lines.append("")
     if breaking:
         lines += ["### Breaking", "", "| Downstream model | Reads removed column | Caused by | Fix |", "|---|---|---|---|"]
         lines += [f"| `{i.node}` | `{i.upstream}.{i.column}` | `{i.via}` | {i.suggestion or '-'} |" for i in breaking]

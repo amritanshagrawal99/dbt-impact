@@ -27,6 +27,7 @@ class Node:
     depends_on: list[str]
     declared_columns: dict[str, str | None]  # documented in YAML (name -> data_type)
     catalog_columns: dict[str, str] | None = None  # from catalog.json, if provided
+    contract_enforced: bool = False  # config.contract.enforced: the declared columns are a public API
     children: list[str] = field(default_factory=list)
 
     @property
@@ -96,6 +97,7 @@ def load_manifest(path: str | Path, catalog: str | Path | None = None, dialect: 
                 checksum=(raw.get("checksum") or {}).get("checksum"),
                 depends_on=[d for d in (raw.get("depends_on") or {}).get("nodes", [])],
                 declared_columns={c.lower(): (v or {}).get("data_type") for c, v in (raw.get("columns") or {}).items()},
+                contract_enforced=bool(((raw.get("config") or {}).get("contract") or {}).get("enforced")),
             )
     for uid, raw in (data.get("nodes") or {}).items():
         if raw.get("resource_type") == "seed" and uid in nodes and not nodes[uid].declared_columns:

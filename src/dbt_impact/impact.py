@@ -37,6 +37,14 @@ class ExposureRisk:
 
 
 @dataclass
+class ContractIssue:
+    node: str
+    column: str
+    kind: str    # removed | type_changed | declared_not_produced | produced_not_declared
+    detail: str = ""
+
+
+@dataclass
 class Report:
     added_models: list[str] = field(default_factory=list)
     removed_models: list[str] = field(default_factory=list)
@@ -46,6 +54,7 @@ class Report:
     impacts: list[Impact] = field(default_factory=list)
     exposures: list[ExposureRisk] = field(default_factory=list)
     unanalysed: dict[str, str] = field(default_factory=dict)
+    contract_issues: list[ContractIssue] = field(default_factory=list)
 
     @property
     def breaking(self) -> list[Impact]:
@@ -53,7 +62,7 @@ class Report:
 
     @property
     def has_breaking(self) -> bool:
-        return bool(self.breaking or self.exposures)
+        return bool(self.breaking or self.exposures or self.contract_issues)
 
 
 def _outputs(node: Node, facts: dict[str, ModelFacts]) -> list[str] | None:
@@ -108,6 +117,8 @@ def compare(base: Manifest, current: Manifest) -> Report:
             if aliases.get(c) in gone:
                 rep.rename_hints.append((node.name, aliases[c], c))
         removed_cols += [(old, c) for c in gone]
+
+    rep.contract_issues = _contracts(base, current, cur_facts)
 
     # Trace from the most upstream change first, so propagated removals are credited to their origin.
     order = {n.unique_id: i for i, n in enumerate(base.topo_order())}
@@ -164,3 +175,28 @@ def _children(uid: str, relation: str, current: Manifest) -> list[Node]:
         return [current.nodes[c] for c in current.nodes[uid].children]
     # Model was deleted: anything still depending on it, or reading its relation, is affected.
     return [n for n in current.nodes.values() if uid in n.depends_on or (n.sql and relation in (n.sql or "").lower())]
+
+
+def _contracts(base: Manifest, current: Manifest, facts: dict[str, ModelFacts]) -> list[ContractIssue]:
+    """Changes to models with an enforced contract, and contracts that no longer match the model's SQL."""
+    out: list[ContractIssue] = []
+    for uid, node in current.nodes.items():
+        if not node.contract_enforced:
+            continue
+        old = base.nodes.get(uid)
+        declared = node.declared_columns
+        if old is not None and old.contract_enforced:
+            for col, typ in old.declared_columns.items():
+                if col not in declared:
+                    out.append(ContractIssue(node.name, col, "removed", "removed from the contract"))
+                elif typ and declared[col] and typ.lower() != declared[col].lower():
+                    out.append(ContractIssue(node.name, col, "type_changed", f"{typ} -> {declared[col]}"))
+        produced = facts.get(uid).outputs if facts.get(uid) else None
+        if produced:
+            for col in declared:
+                if col not in produced:
+                    out.append(ContractIssue(node.name, col, "declared_not_produced", "in the contract but not in the SQL"))
+            for col in produced:
+                if col not in declared:
+                    out.append(ContractIssue(node.name, col, "produced_not_declared", "in the SQL but not in the contract"))
+    return out
